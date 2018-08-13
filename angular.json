@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "baseHref": "http://jvail.github.io/spatiasql.js/",
+            "baseHref": "/",
             "outputPath": "dist/spatialitebrowser",
             "index": "src/index.html",
             "main": "src/main.ts",

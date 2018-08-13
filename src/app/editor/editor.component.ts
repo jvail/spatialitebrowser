@@ -13,11 +13,7 @@ export class EditorComponent implements OnInit, AfterViewInit {
   private editor;
   @ViewChild('editor') editorRef: ElementRef;
 
-
-  constructor() {
-
-
-  }
+  constructor() {}
 
   ngAfterViewInit() {
 
