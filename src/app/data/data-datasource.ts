@@ -2,6 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator, MatSort } from '@angular/material';
 import { map } from 'rxjs/operators';
 import { Subject, Observable, of as observableOf, merge } from 'rxjs';
+import { AppService } from '../app.service';
 
 export class DataDataSource extends DataSource<any> {
 
@@ -11,7 +12,7 @@ export class DataDataSource extends DataSource<any> {
   };
   dataChanged$ = new Subject();
 
-  constructor(private paginator: MatPaginator, private sort: MatSort) {
+  constructor(private paginator: MatPaginator, private sort: MatSort, private appService: AppService) {
     super();
   }
 
@@ -31,11 +32,12 @@ export class DataDataSource extends DataSource<any> {
       this.sort.sortChange
     ];
 
-    const ret = merge(...dataMutations).pipe(map(() => {
-      return this.getPagedData(this.getSortedData(this.data.values));
+    return merge(...dataMutations).pipe(map(() => {
+      const data = this.getPagedData(this.getSortedData(this.data.values));
+      this.appService.draw$.next(data);
+      return data;
     }));
 
-    return ret;
   }
 
   disconnect() {}

@@ -1,10 +1,17 @@
-:host {
-    display: inline;
+#map.large {
+    position: fixed;
+    height: calc(100% - 64px);
+    width: calc(100% - 300px);
+}
+#map.small {
+    position: fixed;
+    height: calc(100% - 64px);
+    width: calc(100% - 900px);
 }
 #map {
     position: fixed;
-    height: calc(100% - 64px);
-    min-height: calc(100% - 64px);
-    width: calc(100% - 300px);
-    min-width: calc(100% - 300px);
+    height: 100%;
+    width: 100%;
+    /* height: calc(100% - 64px);
+    width: calc(100% - 300px); */
 }

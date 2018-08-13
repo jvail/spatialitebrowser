@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, AfterContentChecked } from '@angular/core';
 declare var CodeMirror;
 
 @Component({
@@ -23,7 +23,8 @@ export class EditorComponent implements OnInit, AfterViewInit {
       theme: 'monokai',
       viewportMargin: Infinity,
       lineWrapping: true,
-      scrollbarStyle: 'native'
+      scrollbarStyle: 'native',
+      autoRefresh: true
     });
 
   }

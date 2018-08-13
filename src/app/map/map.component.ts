@@ -20,6 +20,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     features: []
   };
   source: mapboxgl.GeoJSONSource;
+  sideBarOpened = false;
 
   constructor(private appservice: AppService, private dbservice: DBService) {
 
@@ -35,6 +36,13 @@ export class MapComponent implements OnInit, AfterViewInit {
         }, []);
         this.setGeoms(geoms);
       }
+    });
+
+    this.appservice.resizeMap$.subscribe(opened => {
+      this.sideBarOpened = opened;
+      setTimeout(() => {
+        this.map.resize();
+      }, 25);
     });
 
   }

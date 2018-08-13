@@ -3,7 +3,6 @@ import { MatPaginator, MatSort } from '@angular/material';
 import { DataDataSource } from './data-datasource';
 import { DBService } from '../db.service';
 import { AppService } from '../app.service';
-import { map } from 'rxjs/operators';
 import { merge } from 'rxjs';
 
 @Component({
@@ -69,10 +68,10 @@ export class DataComponent implements OnInit {
 
   ngOnInit() {
 
-    this.dataSource = new DataDataSource(this.paginator, this.sort);
-    merge(this.paginator.page, this.sort.sortChange).subscribe(() => {
-      this.appService.draw$.next(this.dataSource.getPage());
-    });
+    this.dataSource = new DataDataSource(this.paginator, this.sort, this.appService);
+    // merge(this.paginator.page, this.sort.sortChange).subscribe(() => {
+    //   this.appService.draw$.next(this.dataSource.getPage());
+    // });
 
   }
 

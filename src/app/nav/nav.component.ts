@@ -1,4 +1,4 @@
-import { Component, Output, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, Output, Inject, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DBService, IVersion, ISRID } from '../db.service';
@@ -92,6 +92,7 @@ export class NavComponent {
   dbIsBusy = false;
 
   showDataTable = false;
+  sidenavdataOpened = false;
 
   tables: string[] = [];
   views: string[] = [];
@@ -120,7 +121,7 @@ export class NavComponent {
 
       this.dbservice.error$.subscribe(error => {
         if (error) {
-          this.toastr.info(error, 'DB Error', {
+          this.toastr.error(error, '', {
             timeOut: 3000,
             positionClass: 'toast-bottom-right'
           });
@@ -130,6 +131,18 @@ export class NavComponent {
       this.item$.subscribe(item => appservice.item$.next(item));
 
     }
+
+
+  onSidenavOpened(opened: boolean) {
+    this.sidenavdataOpened = opened;
+    if (opened) {
+      this.appservice.resizeMap$.next(opened);
+    }
+  }
+
+  onSidenavClosedStart() {
+    this.appservice.resizeMap$.next(false);
+  }
 
   showVersion() {
     this.dbservice.version().then(data => {

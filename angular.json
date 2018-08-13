@@ -14,6 +14,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "baseHref": "/",
+            "deployUrl": "",
             "outputPath": "dist/spatialitebrowser",
             "index": "src/index.html",
             "main": "src/main.ts",

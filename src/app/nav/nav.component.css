@@ -29,5 +29,6 @@ mat-sidenav {
 }
 
 #sidenavdata {
-  width: calc(100% * 0.5);
+  /* width: calc(100% * 0.5); */
+  width: 600px;
 }
