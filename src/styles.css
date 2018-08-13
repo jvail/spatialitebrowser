@@ -1,0 +1,21 @@
+@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
+@import '~mapbox-gl/dist/mapbox-gl.css';
+@import '~ngx-toastr/toastr.css';
+app-root {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.fill-space {
+  flex: 1 1 auto;
+}
+
+.CodeMirror {
+  height: calc(100% - 64px);
+  padding: 10px;
+  font-size: 16px;
+}

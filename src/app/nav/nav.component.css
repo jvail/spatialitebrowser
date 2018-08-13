@@ -1,0 +1,33 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 300px;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+}
+
+.button-row button,
+.button-row a {
+  margin-right: 8px;
+}
+
+mat-nav-list {
+  flex-grow: 1;
+  /* border: 1px solid green; */
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: calc(100% - 70px);
+}
+
+mat-sidenav {
+  overflow: hidden;
+}
+
+#sidenavdata {
+  width: calc(100% * 0.5);
+}
