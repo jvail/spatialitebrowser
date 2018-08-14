@@ -44,7 +44,8 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
+              "outputHashing": "none",
+              "baseHref": "http://jvail.github.io/spatiasql.js/",
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,

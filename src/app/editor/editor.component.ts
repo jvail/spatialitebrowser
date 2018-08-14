@@ -21,7 +21,7 @@ export class EditorComponent implements OnInit, AfterViewInit {
       mode: 'text/x-sql',
       keyMap: 'sublime',
       theme: 'monokai',
-      viewportMargin: Infinity,
+      viewportMargin: 100,
       lineWrapping: true,
       scrollbarStyle: 'native',
       autoRefresh: true

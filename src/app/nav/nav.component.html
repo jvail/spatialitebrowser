@@ -83,15 +83,24 @@
     opened="false">
     <mat-toolbar color="accent">
       <span class="fill-space"></span>
-      <button mat-icon-button *ngIf="showDataTable" [disabled]="!dbInitialized" (click)="runQuery()">
+      <button mat-icon-button [disabled]="!dbInitialized" (click)="runQuery()">
         <mat-icon>play_circle_filled_white</mat-icon>
       </button>
-      <button mat-button (click)="showDataTable = !showDataTable">
+      <!-- <button mat-button (click)="showDataTable = !showDataTable">
         <mat-icon>{{ showDataTable ? 'list' : 'create' }}</mat-icon>
         <span>&nbsp;{{ showDataTable ? 'Data' : 'SQL' }}</span>
-      </button>
+      </button> -->
     </mat-toolbar>
-    <app-editor #appeditor [hidden]="!showDataTable"></app-editor>
-    <app-data [hidden]="showDataTable"></app-data>
+    <!-- <app-editor #appeditor [hidden]="!showDataTable"></app-editor>
+    <app-data [hidden]="showDataTable"></app-data> -->
+    <split direction="vertical" [gutterSize]="5">
+      <split-area size="50">
+        <app-editor #appeditor></app-editor>
+      </split-area>
+      <split-area size="50">
+        <app-data></app-data>
+      </split-area>
+    </split>
+
   </mat-sidenav>
 </mat-sidenav-container>

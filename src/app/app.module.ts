@@ -27,6 +27,7 @@ import { MapComponent } from './map/map.component';
 import { DataComponent } from './data/data.component';
 import { EditorComponent } from './editor/editor.component';
 import { ToastrModule } from 'ngx-toastr';
+import { AngularSplitModule } from 'angular-split';
 
 
 @NgModule({
@@ -60,7 +61,8 @@ import { ToastrModule } from 'ngx-toastr';
     MatOptionModule,
     MatSelectModule,
     MatSlideToggleModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    AngularSplitModule
   ],
   providers: [],
   entryComponents: [VersionDialogComponent, SRIDDialogComponent],
