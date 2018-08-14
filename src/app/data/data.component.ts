@@ -35,6 +35,7 @@ export class DataComponent implements OnInit {
           this.setData(data);
         });
       } else {
+        this.displayedColumns = [];
         this.setData({
           columns: [],
           values: []
@@ -51,6 +52,7 @@ export class DataComponent implements OnInit {
         };
         this.setData(data);
       } else {
+        this.displayedColumns = [];
         this.setData({
           columns: [],
           values: []

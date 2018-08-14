@@ -15,6 +15,7 @@
           "options": {
             "baseHref": "/",
             "deployUrl": "",
+            "outputHashing": "none",
             "outputPath": "dist/spatialitebrowser",
             "index": "src/index.html",
             "main": "src/main.ts",

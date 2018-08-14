@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build-prod": "ng build --configuration=production",
+    "build-prod": "ng build --configuration=production --output-hashing none --base-href http://jvail.github.io/spatiasql.js/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -32,7 +32,7 @@
     "ngx-toastr": "^8.10.0",
     "rxjs": "^6.0.0",
     "rxjs-compat": "^6.2.2",
-    "spatiasql": "^3.0.1-beta",
+    "spatiasql": "git+https://github.com/jvail/spatiasql.js.git#dev",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {

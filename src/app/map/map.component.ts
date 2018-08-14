@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { AppService } from '../app.service';
 import { DBService } from '../db.service';
-import { isGeometryBlob } from 'spatiasql';
+import { geometryFormat, GeometryFormat } from 'spatiasql';
 import { FeatureCollection } from 'geojson';
 import turfbbox from '@turf/bbox';
 
@@ -28,7 +28,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       if (data.length) {
         const geoms = data.reduce((blobs, row) => {
           row.forEach(value => {
-            if (value instanceof Uint8Array && isGeometryBlob(value)) {
+            if (value instanceof Uint8Array && geometryFormat(value) !== GeometryFormat.None) {
               blobs.push(value);
             }
           });
@@ -122,15 +122,9 @@ export class MapComponent implements OnInit, AfterViewInit {
             properties: {}
           };
         });
-        const bbox = turfbbox(this.featureCollection).map(n => {
-          if (n >= 180) { return 179; }
-          if (n <= -180) { return -179; }
-          if (n >= 90) { return 89; }
-          if (n <= -90) { return -89; }
-          return n;
-        });
-        this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
+        const bbox = turfbbox(this.featureCollection);
         this.source.setData(this.featureCollection);
+        this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
       }
     });
 

@@ -137,11 +137,13 @@ export class DBService {
     this.db.open(buffer).then(opened => {
       this.initialized.next(opened);
       this.refreshItems();
-      this.db.exec('select srid, ref_sys_name from spatial_ref_sys').then(results => {
-        this.spatialRefSys.next(results[0][0].values.map(value => {
-          return { srid: value[0], name: value[1] };
-        }));
-      });
+      this.db.exec('select srid, ref_sys_name from spatial_ref_sys')
+        .then(results => {
+          this.spatialRefSys.next(results[0][0].values.map(value => {
+            return { srid: value[0], name: value[1] };
+          }));
+        })
+        .catch(err => this.spatialRefSys.next([]));
 
       // this.db.exec('select geometry from regions limit 1')
       //   .then(results => {

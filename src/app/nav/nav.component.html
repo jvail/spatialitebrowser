@@ -53,7 +53,7 @@
         <input #inputshp type="file" (change)="addFile('shp', $event.target.files)" hidden [multiple]="true">
         <button mat-menu-item (click)="inputsqlite3.click()" [disabled]="!dbInitialized">
           <mat-icon>arrow_upward</mat-icon>
-          <span>Load SQLite or GeoPackage File</span>
+          <span>Load SpatiaLite DB</span>
         </button>
         <button mat-menu-item (click)="inputshp.click()" [disabled]="!dbInitialized">
           <mat-icon>arrow_upward</mat-icon>
