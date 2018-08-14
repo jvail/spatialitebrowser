@@ -35,11 +35,7 @@ export class DataComponent implements OnInit {
           this.setData(data);
         });
       } else {
-        this.displayedColumns = [];
-        this.setData({
-          columns: [],
-          values: []
-        });
+        this.resetTableData();
       }
     });
 
@@ -52,13 +48,15 @@ export class DataComponent implements OnInit {
         };
         this.setData(data);
       } else {
-        this.displayedColumns = [];
-        this.setData({
-          columns: [],
-          values: []
-        });
+        this.resetTableData();
       }
       this.paginator.firstPage();
+    });
+
+    this.dbservice.initialized$.subscribe(opened => {
+      if (opened) {
+        this.resetTableData();
+      }
     });
 
   }
@@ -77,8 +75,28 @@ export class DataComponent implements OnInit {
 
   }
 
-  isObject(thing) {
-    return typeof thing === 'object' && thing !== null;
+  // TODO: return proper string for all not-string-or-number types
+  getDisplayValue(thing) {
+
+    switch (typeof thing) {
+      case 'object':
+        if (thing === null) {
+          return 'NULL';
+        } else {
+          return 'blob';
+        }
+      default:
+        return thing;
+    }
+
+  }
+
+  resetTableData() {
+    this.displayedColumns = [];
+    this.setData({
+      columns: [],
+      values: []
+    });
   }
 
 }

@@ -45,6 +45,13 @@ export class MapComponent implements OnInit, AfterViewInit {
       }, 25);
     });
 
+    this.dbservice.initialized$.subscribe(opened => {
+      if (opened) {
+        this.featureCollection.features = [];
+        this.source.setData(this.featureCollection);
+      }
+    });
+
   }
 
   ngOnInit() {
@@ -102,32 +109,28 @@ export class MapComponent implements OnInit, AfterViewInit {
     //   const features = this.map.queryRenderedFeatures(evt.point, { layers: ['gadm36_DEU_2'] });
     //   console.log(features);
     // });
-
-
-
   }
 
   setGeoms(geoms: Uint8Array[]) {
 
-    this.featureCollection.features = [];
-    this.source.setData(this.featureCollection);
-
-    this.dbservice.asGeoJSON(geoms, { bbox: false, precision: 6 }).then(jsons => {
-      jsons = jsons[0];
-      if (jsons.length) {
-        this.featureCollection.features = jsons.map(json => {
-          return {
-            type: 'Feature',
-            geometry: JSON.parse(json),
-            properties: {}
-          };
-        });
-        const bbox = turfbbox(this.featureCollection);
-        this.source.setData(this.featureCollection);
-        this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
-      }
-    });
+    this.dbservice.asGeoJSON(geoms, { bbox: false, precision: 6 })
+      .then(jsons => {
+        jsons = jsons[0];
+        if (jsons.length) {
+          this.featureCollection.features = jsons.map(json => {
+            return {
+              type: 'Feature',
+              geometry: JSON.parse(json),
+              properties: {}
+            };
+          });
+          const bbox = turfbbox(this.featureCollection);
+          this.source.setData(this.featureCollection);
+          this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
+        }
+      });
 
   }
+
 
 }
