@@ -1,5 +1,5 @@
 <mat-paginator #paginator
-  [length]="dataSource.data.values.length"
+  [length]="dataSource.length"
   [pageIndex]="0"
   [pageSize]="100"
   [pageSizeOptions]="pageSizeOptions">
@@ -7,13 +7,13 @@
 <div class="data-container mat-elevation-z8">
   <table mat-table #table [dataSource]="dataSource" matSort>
 
-    <ng-container *ngFor="let column of displayedColumns; let i = index" [matColumnDef]="column">
+    <ng-container *ngFor="let column of dataSource.data.columns; let i = index" [matColumnDef]="column">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column }}</th>
       <td mat-cell *matCellDef="let row">{{ getDisplayValue(row[i]) }}</td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-header-row *matHeaderRowDef="dataSource.data.columns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: dataSource.data.columns;"></tr>
 
   </table>
 </div>

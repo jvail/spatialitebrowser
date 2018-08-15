@@ -1,51 +1,128 @@
 import { DataSource } from '@angular/cdk/collections';
-import { MatPaginator, MatSort } from '@angular/material';
-import { map } from 'rxjs/operators';
-import { Subject, Observable, of as observableOf, merge } from 'rxjs';
-import { AppService } from '../app.service';
+import { MatPaginator, MatSort, Sort } from '@angular/material';
+import { flatMap, debounceTime } from 'rxjs/operators';
+import { Subject, Observable, of, merge, from, defer, forkJoin } from 'rxjs';
+import { AppService, Item } from '../app.service';
+import { DBService } from '../db.service';
+import { IResult } from 'spatiasql/dist/spatiasql';
+import { ToastrService } from 'ngx-toastr';
 
 export class DataDataSource extends DataSource<any> {
 
-  data = {
+  item: Item = { type: '', name: '' };
+  dataChanged$ = new Subject();
+  data: IResult = {
     columns: [],
     values: []
   };
-  dataChanged$ = new Subject();
+  length = 0;
+  sql = '';
 
-  constructor(private paginator: MatPaginator, private sort: MatSort, private appService: AppService) {
+  constructor(private paginator: MatPaginator, private sort: MatSort,
+    private appService: AppService, private dbService: DBService, private toastr: ToastrService) {
     super();
-  }
 
-  setData(data) {
-    this.data.columns = data.columns;
-    this.data.values = data.values;
-    this.paginator.length = this.data.values.length;
-    this.dataChanged$.next();
+    this.appService.item$.subscribe(item => {
+      if (item.name && item.type) {
+        this.item = item;
+        this.dbService.exec(`select count(*) from ${item.name}`).then(results => {
+          this.length = results[0][0].values[0][0];
+          if (this.length === 0) {
+            this.toastr.info('Result empty', '', {
+              timeOut: 3000,
+              positionClass: 'toast-bottom-right'
+            });
+          }
+        });
+        this.sort.active = '';
+        this.dataChanged$.next();
+        this.sql = 'sql';
+      } else {
+        this.item = { type: '', name: '' };
+        this.length = 0;
+        this.data.columns = [];
+        this.data.values = [];
+        this.sort.active = '';
+        this.sql = '';
+      }
+      this.paginator.firstPage();
+    });
+
+    this.appService.query$.subscribe(sql => {
+      if (sql.trim()) {
+        this.dbService.exec(sql)
+          .then(results => {
+            this.item = { type: '', name: '' };
+            this.sql = sql;
+            this.length = 0;
+            this.sort.active = '';
+            if (results[0][0]) {
+              this.data = results[0][0];
+              this.length = this.data.values.length;
+              this.dataChanged$.next();
+            } else {
+              this.data.columns = [];
+              this.data.values = [];
+            }
+          })
+          .catch(err => console.log(err));
+      }
+    });
+
   }
 
   connect(): Observable<any[]> {
 
-    const dataMutations = [
-      observableOf(this.data.values),
-      this.dataChanged$,
-      this.paginator.page,
-      this.sort.sortChange
-    ];
+    return merge(this.paginator.page, this.sort.sortChange, this.dataChanged$).pipe(
+      debounceTime(1000),
+      flatMap(() => {
+        let sql = '';
+        if (this.item.name && this.item.type) {
+          if (this.item.type === 'Tables') {
+            sql = `
+              select * from ${this.item.name}
+              where rowid not in (
+                select rowid from ${this.item.name}
+                order by ${this.sort.active ? this.sort.active : 'rowid'} ${this.sort.direction}
+                limit ${this.paginator.pageIndex * this.paginator.pageSize}
+              )
+              order by ${this.sort.active ? this.sort.active : 'rowid'} ${this.sort.direction}
+              limit ${this.paginator.pageSize}
+            `;
+          } else if (this.item.type === 'Views') {
+            sql = `select * from ${this.item.name}\n`;
+            if (this.sort.active) {
+              sql += `order by ${this.sort.active} ${this.sort.direction}\n`;
+            }
+            sql += `limit ${this.paginator.pageSize} offset ${this.paginator.pageIndex * this.paginator.pageSize}`;
+          } else {
+            throw this.item;
+          }
+        } else if (this.sql) {
+          const data = this.getPagedData(this.getSortedData(this.data.values));
+          this.appService.draw$.next(data);
+          return [data];
+        }
 
-    return merge(...dataMutations).pipe(map(() => {
-      const data = this.getPagedData(this.getSortedData(this.data.values));
-      this.appService.draw$.next(data);
-      return data;
-    }));
+        return defer(() => {
+          return this.dbService.exec(sql).then(res => {
+            const data = res[0][0];
+            if (data) {
+              this.data = res[0][0];
+              this.appService.draw$.next(this.data.values);
+            } else {
+              this.data.values = [];
+              this.appService.draw$.next([]);
+            }
+            return this.data.values;
+          });
+        });
+
+      }));
 
   }
 
   disconnect() {}
-
-  getPage() {
-    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-    return this.data.values.slice(startIndex, startIndex + this.paginator.pageSize);
-  }
 
   private getPagedData(data: any[]) {
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
@@ -74,8 +151,10 @@ export class DataDataSource extends DataSource<any> {
           return data.sort((a, b) => -('' + a[idx]).localeCompare('' + b[idx]));
         }
       default:
-      return data;
+        return data;
     }
   }
+
+
 }
 

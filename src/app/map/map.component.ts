@@ -46,7 +46,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
 
     this.dbservice.initialized$.subscribe(opened => {
-      if (opened) {
+      if (opened && this.source) {
         this.featureCollection.features = [];
         this.source.setData(this.featureCollection);
       }

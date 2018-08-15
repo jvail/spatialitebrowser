@@ -128,7 +128,7 @@ export class NavComponent {
         }
       });
 
-      this.item$.subscribe(item => appservice.item$.next(item));
+      this.item$.subscribe(item => appservice.item$.next({ type: this.filter.getValue(), name: item }));
 
     }
 
@@ -166,11 +166,7 @@ export class NavComponent {
 
   runQuery() {
     const sql = this.appeditor.sql();
-    this.dbservice.exec(sql)
-      .then(results => {
-        results = results[0];
-        this.appservice.results$.next(results);
-      });
+    this.appservice.query$.next(sql);
   }
 
   addFile(type: string, files: FileList) {
@@ -183,7 +179,7 @@ export class NavComponent {
         case 'sqlite3':
           reader.onload = () => {
             this.dbservice.open(reader.result);
-            this.appservice.item$.next('');
+            this.appservice.item$.next({ type: this.filter.getValue(), name: '' });
             this.inputSqlite3.nativeElement.value = '';
           };
           reader.readAsArrayBuffer(files.item(0));
