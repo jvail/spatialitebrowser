@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
-import { MatPaginator, MatSort, Sort } from '@angular/material';
+import { MatPaginator, MatSort } from '@angular/material';
 import { flatMap, debounceTime } from 'rxjs/operators';
-import { Subject, Observable, of, merge, from, defer, forkJoin } from 'rxjs';
+import { Subject, Observable, merge, defer } from 'rxjs';
 import { AppService, Item } from '../app.service';
 import { DBService } from '../db.service';
 import { IResult } from 'spatiasql/dist/spatiasql';

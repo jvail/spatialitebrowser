@@ -5,6 +5,7 @@ import { DBService } from '../db.service';
 import { geometryFormat, GeometryFormat } from 'spatiasql';
 import { FeatureCollection } from 'geojson';
 import turfbbox from '@turf/bbox';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-map',
@@ -22,7 +23,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   source: mapboxgl.GeoJSONSource;
   sideBarOpened = false;
 
-  constructor(private appservice: AppService, private dbservice: DBService) {
+  constructor(private appservice: AppService, private dbservice: DBService, private toastr: ToastrService) {
 
     this.appservice.draw$.subscribe(data => {
       if (data.length) {
@@ -116,17 +117,29 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.dbservice.asGeoJSON(geoms, { bbox: false, precision: 6 })
       .then(jsons => {
         jsons = jsons[0];
+        const nullCount = jsons.filter(json => json[0] === null).length;
         if (jsons.length) {
-          this.featureCollection.features = jsons.map(json => {
-            return {
-              type: 'Feature',
-              geometry: JSON.parse(json),
-              properties: {}
-            };
-          });
-          const bbox = turfbbox(this.featureCollection);
+          this.featureCollection.features = jsons.reduce((arr, json) => {
+            if (json[0] !== null) {
+              arr.push({
+                type: 'Feature',
+                geometry: JSON.parse(json[0]),
+                properties: {}
+              });
+            }
+            return arr;
+          }, []);
+          if (this.featureCollection.features.length > 0) {
+            const bbox = turfbbox(this.featureCollection);
+            this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
+          }
           this.source.setData(this.featureCollection);
-          this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
+        }
+        if (nullCount) {
+          this.toastr.error(`GeoJSON creation and/or transformation to 4326 failed for ${nullCount} geometries`, '', {
+            timeOut: 5000,
+            positionClass: 'toast-bottom-right'
+          });
         }
       });
 

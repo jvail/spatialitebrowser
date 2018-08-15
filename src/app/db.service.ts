@@ -2,6 +2,28 @@ import { Injectable } from '@angular/core';
 import { Database, IShpFiles, IResult, IGeoJSONOptions } from 'spatiasql/dist/spatiasql';
 import { BehaviorSubject } from 'rxjs';
 
+// SELECT
+// HasIconv(),
+// HasMathSQL(),
+// HasGeoCallbacks(),
+// HasProj(),
+// HasGeos(),
+// HasGeosAdvanced(),
+// HasGeosTrunk(),
+// HasGeosReentrant(),
+// HasGeosOnlyReentrant(),
+// HasRtTopo(),
+// HasLibXML2(),
+// HasEpsg(),
+// HasFreeXL(),
+// HasGeoPackage(),
+// HasGCP(),
+// HasGroundControlPoints(),
+// HasTopology(),
+// HasKNN(),
+// HasRouting()
+
+
 export interface IVersion {
   spatialite: string;
   sqlite: string;
