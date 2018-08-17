@@ -91,8 +91,7 @@ export class NavComponent {
   dbInitialized = false;
   dbIsBusy = false;
 
-  showDataTable = false;
-  sidenavdataOpened = false;
+  sidenavdataOpened = true;
 
   tables: string[] = [];
   views: string[] = [];

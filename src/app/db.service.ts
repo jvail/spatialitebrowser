@@ -70,12 +70,6 @@ export class DBService {
 
     this.db = new Database();
 
-    fetch('assets/db/db.sqlite').then(file => {
-      file.arrayBuffer().then(buffer => {
-        this.open(buffer);
-      });
-    });
-
   }
 
   async exec(sql: string, userData?: any): Promise<IResult[] | any[]> {

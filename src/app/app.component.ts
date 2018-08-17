@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { DBService } from './db.service';
+import { AppService } from './app.service';
 // import { Database } from 'spatiasql/dist/spatiasql';
 // import * as FileSaver from 'file-saver';
 // import * as mapboxgl from 'mapbox-gl';
@@ -10,10 +12,46 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
 
-  constructor() {
+  constructor(private dbService: DBService, private appService: AppService) {
 
-    // this.db = new Database();
+    const params = new URLSearchParams(window.location.search.substring(1));
+    const url = params.get('db');
+    const qry = params.get('qry');
 
+    if (url) {
+      fetch(url)
+        .then(db => {
+          if (db.ok) {
+            db.arrayBuffer().then(buffer => {
+              this.dbService.open(buffer);
+              if (qry) {
+                this.appService.query$.next(qry);
+              }
+            });
+          } else {
+            this.openDefaultDb(qry);
+          }
+        })
+        .catch(err => {
+          this.openDefaultDb(qry);
+        });
+    } else {
+      this.openDefaultDb(qry);
+    }
+
+
+
+  }
+
+  openDefaultDb(qry) {
+    fetch('assets/db/db.sqlite').then(defaultDb => {
+      defaultDb.arrayBuffer().then(buffer => {
+        this.dbService.open(buffer);
+        if (qry) {
+          this.appService.query$.next(qry);
+        }
+      });
+    });
   }
 
 

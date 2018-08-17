@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, AfterContentChecked } from '@angular/core';
+import { AppService } from '../app.service';
 declare var CodeMirror;
 
 @Component({
@@ -9,11 +10,21 @@ declare var CodeMirror;
 export class EditorComponent implements OnInit, AfterViewInit {
 
   text = '';
+  sqlQry = '';
   options = { maxLines: 1000, printMargin: false };
   private editor;
   @ViewChild('editor') editorRef: ElementRef;
 
-  constructor() {}
+  constructor(private appService: AppService) {
+
+    this.appService.query$.subscribe(sql => {
+      if (this.sqlQry !== sql && this.editor) {
+        this.sqlQry = sql;
+        this.editor.getDoc().setValue(this.sqlQry);
+      }
+    });
+
+  }
 
   ngAfterViewInit() {
 
@@ -26,6 +37,10 @@ export class EditorComponent implements OnInit, AfterViewInit {
       scrollbarStyle: 'native',
       autoRefresh: true
     });
+
+    if (this.sqlQry) {
+      this.editor.getDoc().setValue(this.sqlQry);
+    }
 
   }
 
