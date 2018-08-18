@@ -18,9 +18,7 @@ import {
   MatTableModule,
   MatPaginatorModule,
   MatSortModule,
-  MatOptionModule,
-  MatSelectModule,
-  MatSlideToggleModule
+  MatSelectModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MapComponent } from './map/map.component';
@@ -58,9 +56,7 @@ import { AngularSplitModule } from 'angular-split';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatOptionModule,
     MatSelectModule,
-    MatSlideToggleModule,
     ToastrModule.forRoot(),
     AngularSplitModule
   ],

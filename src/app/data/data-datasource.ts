@@ -78,7 +78,7 @@ export class DataDataSource extends DataSource<any> {
       flatMap(() => {
         let sql = '';
         if (this.item.name && this.item.type) {
-          if (this.item.type === 'Tables') {
+          if (this.item.type === 'Tables' || this.item.type === 'Meta Tables') {
             sql = `
               select * from ${this.item.name}
               where rowid not in (
@@ -89,7 +89,7 @@ export class DataDataSource extends DataSource<any> {
               order by ${this.sort.active ? this.sort.active : 'rowid'} ${this.sort.direction}
               limit ${this.paginator.pageSize}
             `;
-          } else if (this.item.type === 'Views') {
+          } else if (this.item.type === 'Views' || this.item.type === 'Meta Views') {
             sql = `select * from ${this.item.name}\n`;
             if (this.sort.active) {
               sql += `order by ${this.sort.active} ${this.sort.direction}\n`;

@@ -19,6 +19,7 @@ export class AppService {
   results$: Subject<any[] | IResult[]> = new Subject();
   draw$: Subject<any[]> = new Subject();
   resizeMap$: Subject<boolean> = new Subject();
+  highlightFeature$: Subject<number> = new Subject();
 
   constructor(private dbservice: DBService) {}
 

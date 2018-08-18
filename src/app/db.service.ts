@@ -39,6 +39,8 @@ export interface ISRID {
 export interface IItems {
   tables: string[];
   views: string[];
+  tablesMeta: string[];
+  viewsMeta: string[];
 }
 
 @Injectable({
@@ -48,10 +50,129 @@ export class DBService {
 
   private db: Database;
 
-  private sysTables = ['sqlite_sequence', 'geometry_columns', 'spatial_ref_sys', 'spatialite_history'];
-  private sysViews = ['geom_cols_ref_sys'];
+  private metaTables = [
+    'spatial_ref_sys',
+    'spatialite_history',
+    'sqlite_sequence',
+    'geometry_columns',
+    'spatial_ref_sys_aux',
+    'views_geometry_columns',
+    'virts_geometry_columns',
+    'geometry_columns_statistics',
+    'views_geometry_columns_statistics',
+    'virts_geometry_columns_statistics',
+    'geometry_columns_field_infos',
+    'views_geometry_columns_field_infos',
+    'virts_geometry_columns_field_infos',
+    'geometry_columns_time',
+    'geometry_columns_auth',
+    'views_geometry_columns_auth',
+    'virts_geometry_columns_auth',
+    'data_licenses',
+    'sql_statements_log',
+    'SpatialIndex',
+    'ElementaryGeometries',
+    'KNN'
+  ];
+  private metaViews = [
+    'geom_cols_ref_sys',
+    'spatial_ref_sys_all',
+    'vector_layers',
+    'vector_layers_auth',
+    'vector_layers_statistics',
+    'vector_layers_field_infos'
+  ];
+  private metaIndices = [
+    'sqlite_autoindex_geometry_columns_1',
+    'sqlite_autoindex_views_geometry_columns_1',
+    'sqlite_autoindex_virts_geometry_columns_1',
+    'sqlite_autoindex_geometry_columns_statistics_1',
+    'sqlite_autoindex_views_geometry_columns_statistics_1',
+    'sqlite_autoindex_virts_geometry_columns_statistics_1',
+    'sqlite_autoindex_geometry_columns_field_infos_1',
+    'sqlite_autoindex_views_geometry_columns_field_infos_1',
+    'sqlite_autoindex_virts_geometry_columns_field_infos_1',
+    'sqlite_autoindex_geometry_columns_time_1',
+    'sqlite_autoindex_geometry_columns_auth_1',
+    'sqlite_autoindex_views_geometry_columns_auth_1',
+    'sqlite_autoindex_virts_geometry_columns_auth_1',
+    'sqlite_autoindex_data_licenses_1',
+    'idx_spatial_ref_sys',
+    'idx_srid_geocols',
+    'idx_viewsjoin',
+    'idx_virtssrid'
+  ];
+  private metaTriggers = [
+    'geometry_columns_f_table_name_insert',
+    'geometry_columns_f_table_name_update',
+    'geometry_columns_f_geometry_column_insert',
+    'geometry_columns_f_geometry_column_update',
+    'geometry_columns_geometry_type_insert',
+    'geometry_columns_geometry_type_update',
+    'geometry_columns_coord_dimension_insert',
+    'geometry_columns_coord_dimension_update',
+    'vwgc_view_name_insert',
+    'vwgc_view_name_update',
+    'vwgc_view_geometry_insert',
+    'vwgc_view_geometry_update',
+    'vwgc_view_rowid_update',
+    'vwgc_view_rowid_insert',
+    'vwgc_f_table_name_insert',
+    'vwgc_f_table_name_update',
+    'vwgc_f_geometry_column_insert',
+    'vwgc_f_geometry_column_update',
+    'vtgc_virt_name_insert',
+    'vtgc_virt_name_update',
+    'vtgc_virt_geometry_insert',
+    'vtgc_virt_geometry_update',
+    'vtgc_geometry_type_insert',
+    'vtgc_geometry_type_update',
+    'vtgc_coord_dimension_insert',
+    'vtgc_coord_dimension_update',
+    'gcs_f_table_name_insert',
+    'gcs_f_table_name_update',
+    'gcs_f_geometry_column_insert',
+    'gcs_f_geometry_column_update',
+    'vwgcs_view_name_insert',
+    'vwgcs_view_name_update',
+    'vwgcs_view_geometry_insert',
+    'vwgcs_view_geometry_update',
+    'vtgcs_virt_name_insert',
+    'vtgcs_virt_name_update',
+    'vtgcs_virt_geometry_insert',
+    'vtgcs_virt_geometry_update',
+    'gcfi_f_table_name_insert',
+    'gcfi_f_table_name_update',
+    'gcfi_f_geometry_column_insert',
+    'gcfi_f_geometry_column_update',
+    'vwgcfi_view_name_insert',
+    'vwgcfi_view_name_update',
+    'vwgcfi_view_geometry_insert',
+    'vwgcfi_view_geometry_update',
+    'vtgcfi_virt_name_insert',
+    'vtgcfi_virt_name_update',
+    'vtgcfi_virt_geometry_insert',
+    'vtgcfi_virt_geometry_update',
+    'gctm_f_table_name_insert',
+    'gctm_f_table_name_update',
+    'gctm_f_geometry_column_insert',
+    'gctm_f_geometry_column_update',
+    'gcau_f_table_name_insert',
+    'gcau_f_table_name_update',
+    'gcau_f_geometry_column_insert',
+    'gcau_f_geometry_column_update',
+    'vwgcau_view_name_insert',
+    'vwgcau_view_name_update',
+    'vwgcau_view_geometry_insert',
+    'vwgcau_view_geometry_update',
+    'vtgcau_virt_name_insert',
+    'vtgcau_virt_name_update',
+    'vtgcau_virt_geometry_insert',
+    'vtgcau_virt_geometry_update'
+  ];
 
-  private items: BehaviorSubject<IItems> = new BehaviorSubject({ tables: [], views: [] });
+
+  private items: BehaviorSubject<IItems> = new BehaviorSubject({ tables: [], views: [], tablesMeta: [], viewsMeta: [] });
   items$ = this.items.asObservable();
 
   private initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -106,25 +227,25 @@ export class DBService {
 
   async refreshItems() {
     const result = await this.db.exec('select name, type from sqlite_master order by name');
-    const items = result[0][0].values.reduce((obj, value) => {
+    const items = result[0][0].values.reduce((obj: IItems, value) => {
       switch (value[1]) {
         case 'table':
-          if (this.sysTables.indexOf(value[0]) < 0) {
+          if (this.metaTables.indexOf(value[0]) < 0) {
             obj.tables.push(value[0]);
           } else {
-            obj.sysTables.push(value[0]);
+            obj.tablesMeta.push(value[0]);
           }
           break;
         case 'view':
-          if (this.sysViews.indexOf(value[0]) < 0) {
+          if (this.metaViews.indexOf(value[0]) < 0) {
             obj.views.push(value[0]);
           } else {
-            obj.sysViews.push(value[0]);
+            obj.viewsMeta.push(value[0]);
           }
           break;
       }
       return obj;
-    }, { sysTables: [], sysViews: [], tables: [], views: [] });
+    }, <IItems>{ tablesMeta: [], viewsMeta: [], tables: [], views: [] });
 
     this.items.next(items);
   }

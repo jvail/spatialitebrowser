@@ -5,7 +5,7 @@
   [pageSizeOptions]="pageSizeOptions">
 </mat-paginator>
 <div class="data-container mat-elevation-z8">
-  <table mat-table #table [dataSource]="dataSource" matSort>
+  <table mat-table #table [dataSource]="dataSource" matSort (mouseleave)="appService.highlightFeature$.next(-1)">
 
     <ng-container *ngFor="let column of dataSource.data.columns; let i = index" [matColumnDef]="column">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column }}</th>
@@ -13,7 +13,7 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="dataSource.data.columns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let row; columns: dataSource.data.columns;"></tr>
+    <tr mat-row *matRowDef="let row; let i = index; columns: dataSource.data.columns;" (mouseenter)="appService.highlightFeature$.next(i)"></tr>
 
   </table>
 </div>

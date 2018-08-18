@@ -10,14 +10,21 @@
       </button>
       <mat-menu #filterMenu="matMenu">
         <button mat-menu-item (click)="filter.next('Tables')">
-          <mat-icon *ngIf="(filter$ | async) === 'Tables'">checked</mat-icon>
-          <mat-icon *ngIf="(filter$ | async) !== 'Tables'"></mat-icon>
+          <mat-icon>{{ (filter$ | async) === 'Tables' ? 'checked' : '' }}</mat-icon>
           <span>Tables</span>
         </button>
         <button mat-menu-item (click)="filter.next('Views')">
-          <mat-icon *ngIf="(filter$ | async) === 'Views'">checked</mat-icon>
-          <mat-icon *ngIf="(filter$ | async) !== 'Views'"></mat-icon>
+          <mat-icon>{{ (filter$ | async) === 'Views' ? 'checked' : '' }}</mat-icon>
           <span>Views</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="filter.next('Meta Tables')">
+          <mat-icon>{{ (filter$ | async) === 'Meta Tables' ? 'checked' : '' }}</mat-icon>
+          <span>Meta Tables</span>
+        </button>
+        <button mat-menu-item (click)="filter.next('Meta Views')">
+          <mat-icon>{{ (filter$ | async) === 'Meta Views' ? 'checked' : '' }}</mat-icon>
+          <span>Meta Views</span>
         </button>
       </mat-menu>
       <span class="fill-space"></span>
@@ -32,12 +39,18 @@
       <ng-container *ngIf="(filter$ | async) === 'Views'">
         <a mat-list-item *ngFor="let view of views" (click)="item.next(view)">{{ view }}</a>
       </ng-container>
+      <ng-container *ngIf="(filter$ | async) === 'Meta Tables'">
+        <a mat-list-item *ngFor="let table of tablesMeta" (click)="item.next(table)">{{ table }}</a>
+      </ng-container>
+      <ng-container *ngIf="(filter$ | async) === 'Meta Views'">
+        <a mat-list-item *ngFor="let view of viewsMeta" (click)="item.next(view)">{{ view }}</a>
+      </ng-container>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary">
+    <mat-toolbar color="accent">
       <button mat-button>
-        <a class="mat-toolbar mat-primary" style="text-decoration: none" target="_blank" href="https://github.com/jvail/spatiasql.js">SpatiaSQL.js</a>
+        <a class="mat-toolbar mat-accent" style="text-decoration: none" target="_blank" href="https://github.com/jvail/spatiasql.js">SpatiaSQL.js</a>
       </button>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
@@ -46,7 +59,8 @@
         <mat-icon>info</mat-icon>
       </button>
       <ng-template #spinner>
-        <mat-spinner color="accent" [diameter]=22></mat-spinner>
+        <mat-spinner color="primary" [diameter]=22></mat-spinner>
+        <!-- <mat-icon matBadge="15" matBadgePosition="before" matBadgeColor="primary" matBadgeSize="medium"></mat-icon> -->
       </ng-template>
       <mat-menu #menu="matMenu">
         <input #inputsqlite3 type="file" (change)="addFile('sqlite3', $event.target.files)" hidden>

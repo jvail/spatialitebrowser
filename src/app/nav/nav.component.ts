@@ -95,6 +95,8 @@ export class NavComponent {
 
   tables: string[] = [];
   views: string[] = [];
+  tablesMeta: string[] = [];
+  viewsMeta: string[] = [];
   spatialRefSys: ISRID[] = [];
 
   constructor(
@@ -107,6 +109,8 @@ export class NavComponent {
       this.dbservice.items$.subscribe(items => {
         this.tables = items.tables;
         this.views = items.views;
+        this.tablesMeta = items.tablesMeta;
+        this.viewsMeta = items.viewsMeta;
       });
 
       this.dbservice.initialized$.subscribe(initialized => this.dbInitialized = initialized);

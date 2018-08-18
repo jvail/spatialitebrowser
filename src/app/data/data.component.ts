@@ -19,7 +19,7 @@ export class DataComponent implements OnInit {
   displayedColumns = [];
   pageSizeOptions = [25, 50, 100, 500, 1000, 2500, 10000];
 
-  constructor(private dbservice: DBService, private appService: AppService, private toastrService: ToastrService) {}
+  constructor(private dbservice: DBService, public appService: AppService, private toastrService: ToastrService) {}
 
   ngOnInit() {
 
