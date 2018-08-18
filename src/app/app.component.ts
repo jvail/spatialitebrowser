@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DBService } from './db.service';
 import { AppService } from './app.service';
+import { AotSummaryResolver } from '@angular/compiler';
 // import { Database } from 'spatiasql/dist/spatiasql';
 // import * as FileSaver from 'file-saver';
 // import * as mapboxgl from 'mapbox-gl';

@@ -50,7 +50,9 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.dbservice.initialized$.subscribe(opened => {
       if (opened && this.source) {
         this.featureCollection.features = [];
-        this.source.setData(this.featureCollection);
+        if (this.source) {
+          this.source.setData(this.featureCollection);
+        }
       }
     });
 
@@ -138,7 +140,9 @@ export class MapComponent implements OnInit, AfterViewInit {
             const bbox = turfbbox(this.featureCollection);
             this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });
           }
-          this.source.setData(this.featureCollection);
+          if (this.source) {
+            this.source.setData(this.featureCollection);
+          }
         }
         if (nullCount) {
           this.toastr.error(`GeoJSON creation and/or transformation to 4326 failed for ${nullCount} geometries`, '', {
