@@ -1,10 +1,7 @@
 import { Component } from '@angular/core';
 import { DBService } from './db.service';
 import { AppService } from './app.service';
-import { AotSummaryResolver } from '@angular/compiler';
-// import { Database } from 'spatiasql/dist/spatiasql';
-// import * as FileSaver from 'file-saver';
-// import * as mapboxgl from 'mapbox-gl';
+import * as JSZip from 'jszip';
 
 @Component({
   selector: 'app-root',
@@ -20,13 +17,31 @@ export class AppComponent {
     const qry = params.get('qry');
 
     if (url) {
-      fetch(url)
+      fetch(decodeURIComponent(url))
         .then(db => {
           if (db.ok) {
             db.arrayBuffer().then(buffer => {
-              this.dbService.open(buffer);
-              if (qry) {
-                this.appService.query$.next(qry);
+              if (url.indexOf('data:application/zip') === 0 || url.endsWith('.zip')) {
+                new JSZip().loadAsync(buffer)
+                  .then(unziped => {
+                    const names = Object.keys(unziped.files);
+                    if (names.length > 0) {
+                      unziped.files[names[0]].async('arraybuffer')
+                        .then(res => {
+                          this.dbService.open(res);
+                          if (qry) {
+                            this.appService.query$.next(qry);
+                          }
+                        });
+                    } else {
+                      throw new Error('Expected zip file');
+                    }
+                  });
+              } else {
+                this.dbService.open(buffer);
+                if (qry) {
+                  this.appService.query$.next(qry);
+                }
               }
             });
           } else {
