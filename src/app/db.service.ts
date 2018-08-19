@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Database, srid as getSRID, IShpFiles, IResult, IGeoJSONOptions } from 'spatiasql/dist/spatiasql';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { debounce, debounceTime } from 'rxjs/operators';
 
 // SELECT
 // HasIconv(),
@@ -185,12 +186,18 @@ export class DBService {
   private busy: BehaviorSubject<boolean> = new BehaviorSubject(false);
   busy$ = this.busy.asObservable();
 
+  private jobCount: BehaviorSubject<number> = new BehaviorSubject(1);
+  jobCount$ = this.jobCount.asObservable().pipe(debounce(no => no ? timer(0) : timer(100)));
+
   private error: BehaviorSubject<string> = new BehaviorSubject('');
   error$ = this.error.asObservable();
 
   constructor() {
 
     this.db = new Database();
+    this.db.on('jobQueueChange', (no) => {
+      this.jobCount.next(no);
+    });
     this.geo = new Database();
 
   }

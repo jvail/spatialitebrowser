@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-// import { FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { NavComponent, VersionDialogComponent, SRIDDialogComponent } from './nav/nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
@@ -19,6 +19,7 @@ import {
   MatPaginatorModule,
   MatSortModule,
   MatSelectModule,
+  MatBadgeModule,
   MatSnackBarModule,
   MAT_SNACK_BAR_DEFAULT_OPTIONS
 } from '@angular/material';
@@ -41,7 +42,7 @@ import { AngularSplitModule } from 'angular-split';
   ],
   imports: [
     BrowserModule,
-    // FormsModule,
+    FormsModule,
     LayoutModule,
     BrowserAnimationsModule,
     MatToolbarModule,
@@ -58,6 +59,7 @@ import { AngularSplitModule } from 'angular-split';
     MatPaginatorModule,
     MatSortModule,
     MatSelectModule,
+    MatBadgeModule,
     MatSnackBarModule,
     AngularSplitModule
   ],

@@ -100,7 +100,7 @@ export class NavComponent {
   spatialRefSys: ISRID[] = [];
 
   constructor(
-    private dbservice: DBService,
+    public dbservice: DBService,
     private appservice: AppService,
     public snackBar: MatSnackBar,
     public versionDialog: MatDialog,

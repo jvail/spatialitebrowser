@@ -55,12 +55,12 @@
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
       </button>
-      <button mat-icon-button *ngIf="dbInitialized && !dbIsBusy; else spinner" (click)="showVersion()">
+      <button mat-icon-button *ngIf="dbInitialized && (dbservice.jobCount$ | async) === 0; else spinner" (click)="showVersion()">
         <mat-icon>info</mat-icon>
       </button>
       <ng-template #spinner>
-        <mat-spinner color="primary" [diameter]=22></mat-spinner>
-        <!-- <mat-icon matBadge="15" matBadgePosition="before" matBadgeColor="primary" matBadgeSize="medium"></mat-icon> -->
+        <mat-spinner color="primary" [diameter]=22 ></mat-spinner>
+        <mat-icon [matBadge]="dbservice.jobCount$ | async" matBadgeOverlap="true" matBadgePosition="before" matBadgeColor="primary" matBadgeSize="medium">&nbsp;</mat-icon>
       </ng-template>
       <mat-menu #menu="matMenu">
         <input #inputsqlite3 type="file" (change)="addFile('sqlite3', $event.target.files)" hidden>
