@@ -5,7 +5,7 @@ import { DBService } from '../db.service';
 import { geometryFormat, GeometryFormat } from 'spatiasql';
 import { FeatureCollection } from 'geojson';
 import turfbbox from '@turf/bbox';
-import { ToastrService } from 'ngx-toastr';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-map',
@@ -24,7 +24,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   sideBarOpened = false;
   highlightedFeatureId = -1;
 
-  constructor(private appservice: AppService, private dbservice: DBService, private toastr: ToastrService) {
+  constructor(private appservice: AppService, private dbservice: DBService, private snackBar: MatSnackBar) {
 
     this.appservice.draw$.subscribe(data => {
       if (data.length) {
@@ -145,10 +145,10 @@ export class MapComponent implements OnInit, AfterViewInit {
           }
         }
         if (nullCount) {
-          this.toastr.error(`GeoJSON creation and/or transformation to 4326 failed for ${nullCount} geometries`, '', {
-            timeOut: 5000,
-            positionClass: 'toast-bottom-right'
-          });
+          this.snackBar.open(`
+            GeoJSON creation and/or transformation to 4326 failed for ${nullCount} geometries.
+            Probably SRID 4326 is missing in table spatial_ref_sys.
+          `);
         }
       });
 

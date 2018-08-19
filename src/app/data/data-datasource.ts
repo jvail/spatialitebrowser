@@ -5,7 +5,7 @@ import { Subject, Observable, merge, defer } from 'rxjs';
 import { AppService, Item } from '../app.service';
 import { DBService } from '../db.service';
 import { IResult } from 'spatiasql/dist/spatiasql';
-import { ToastrService } from 'ngx-toastr';
+import { MatSnackBar } from '@angular/material';
 
 export class DataDataSource extends DataSource<any> {
 
@@ -19,7 +19,7 @@ export class DataDataSource extends DataSource<any> {
   sql = '';
 
   constructor(private paginator: MatPaginator, private sort: MatSort,
-    private appService: AppService, private dbService: DBService, private toastr: ToastrService) {
+    private appService: AppService, private dbService: DBService, public snackBar: MatSnackBar) {
     super();
 
     this.appService.item$.subscribe(item => {
@@ -28,10 +28,7 @@ export class DataDataSource extends DataSource<any> {
         this.dbService.exec(`select count(*) from ${item.name}`).then(results => {
           this.length = results[0][0].values[0][0];
           if (this.length === 0) {
-            this.toastr.info('Result empty', '', {
-              timeOut: 3000,
-              positionClass: 'toast-bottom-right'
-            });
+            this.snackBar.open('Result empty');
           }
         });
         this.sort.active = '';
@@ -56,7 +53,7 @@ export class DataDataSource extends DataSource<any> {
             this.sql = sql;
             this.length = 0;
             this.sort.active = '';
-            if (results[0][0]) {
+            if (results[0] && results[0][0]) {
               this.data = results[0][0];
               this.length = this.data.values.length;
               this.dataChanged$.next();

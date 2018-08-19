@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, IShpFiles, IResult, IGeoJSONOptions } from 'spatiasql/dist/spatiasql';
+import { Database, srid as getSRID, IShpFiles, IResult, IGeoJSONOptions } from 'spatiasql/dist/spatiasql';
 import { BehaviorSubject } from 'rxjs';
 
 // SELECT
@@ -49,6 +49,7 @@ export interface IItems {
 export class DBService {
 
   private db: Database;
+  private geo: Database;
 
   private metaTables = [
     'spatial_ref_sys',
@@ -190,6 +191,7 @@ export class DBService {
   constructor() {
 
     this.db = new Database();
+    this.geo = new Database();
 
   }
 
@@ -211,18 +213,20 @@ export class DBService {
 
   async asGeoJSON(geoms: Uint8Array[], options?: IGeoJSONOptions) {
 
-    this.busy.next(true);
+    // just check the first one
+    const srid = getSRID(geoms[0]);
+    return this.geo.exec(`select InsertEpsgSrid(${srid})`)
+      .then(() => {
+        return this.geo.asGeoJSON(geoms, options)
+          .then(res => {
+            return res;
+          })
+          .catch(err => {
+            this.error.next(err);
+            return [];
+          });
+        });
 
-    return this.db.asGeoJSON(geoms, options)
-      .then(res => {
-        this.busy.next(this.db.busy());
-        return res;
-      })
-      .catch(err => {
-        this.busy.next(this.db.busy());
-        this.error.next(err);
-        return [];
-      });
   }
 
   async refreshItems() {

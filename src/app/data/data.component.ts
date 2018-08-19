@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator, MatSort, MatSnackBar } from '@angular/material';
 import { DataDataSource } from './data-datasource';
 import { DBService } from '../db.service';
 import { AppService } from '../app.service';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-data',
@@ -19,11 +18,11 @@ export class DataComponent implements OnInit {
   displayedColumns = [];
   pageSizeOptions = [25, 50, 100, 500, 1000, 2500, 10000];
 
-  constructor(private dbservice: DBService, public appService: AppService, private toastrService: ToastrService) {}
+  constructor(private dbservice: DBService, public appService: AppService, public snackBar: MatSnackBar) {}
 
   ngOnInit() {
 
-    this.dataSource = new DataDataSource(this.paginator, this.sort, this.appService, this.dbservice, this.toastrService);
+    this.dataSource = new DataDataSource(this.paginator, this.sort, this.appService, this.dbservice, this.snackBar);
 
   }
 

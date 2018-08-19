@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DBService, IVersion, ISRID } from '../db.service';
 import * as FileSaver from 'file-saver';
 import { AppService } from '../app.service';
-import { ToastrService } from 'ngx-toastr';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-version-dialog',
@@ -102,7 +102,7 @@ export class NavComponent {
   constructor(
     private dbservice: DBService,
     private appservice: AppService,
-    private toastr: ToastrService,
+    public snackBar: MatSnackBar,
     public versionDialog: MatDialog,
     public sridDialog: MatDialog) {
 
@@ -124,10 +124,7 @@ export class NavComponent {
 
       this.dbservice.error$.subscribe(error => {
         if (error) {
-          this.toastr.error(error, '', {
-            timeOut: 3000,
-            positionClass: 'toast-bottom-right'
-          });
+          this.snackBar.open(error);
         }
       });
 

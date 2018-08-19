@@ -1,6 +1,5 @@
 @import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
 @import '~mapbox-gl/dist/mapbox-gl.css';
-@import '~ngx-toastr/toastr.css';
 app-root {
   display: flex;
   flex-direction: column;
@@ -17,15 +16,6 @@ app-root {
 .CodeMirror {
   height: 100%;
   font-size: 16px;
-}
-
-.toast-error {
-  background-color: #303030;
-}
-
-.toast-container .toast {
-  box-shadow: 0 0 0 0;
-  color: #f8f8f2;
 }
 
 split-gutter {
