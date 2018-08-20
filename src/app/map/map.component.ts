@@ -6,6 +6,7 @@ import { geometryFormat, GeometryFormat } from 'spatiasql';
 import { FeatureCollection } from 'geojson';
 import turfbbox from '@turf/bbox';
 import { MatSnackBar } from '@angular/material';
+import { srid as getSRID } from 'spatiasql/dist/spatiasql';
 
 @Component({
   selector: 'app-map',
@@ -120,6 +121,11 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   setGeoms(geoms: Uint8Array[]) {
 
+    if (geoms.length === 0) {
+      this.featureCollection.features = [];
+      this.source.setData(this.featureCollection);
+    }
+
     this.dbservice.asGeoJSON(geoms, { bbox: false, precision: 6 })
       .then(jsons => {
         jsons = jsons[0];
@@ -127,12 +133,16 @@ export class MapComponent implements OnInit, AfterViewInit {
         if (jsons.length) {
           this.featureCollection.features = jsons.reduce((arr, json, idx) => {
             if (json[0] !== null) {
-              arr.push({
-                id: idx + 1,
-                type: 'Feature',
-                geometry: JSON.parse(json[0]),
-                properties: {}
-              });
+              try {
+                arr.push({
+                  id: idx + 1,
+                  type: 'Feature',
+                  geometry: JSON.parse(json[0]),
+                  properties: {}
+                });
+              } catch (err) {
+                console.log(err);
+              }
             }
             return arr;
           }, []);
@@ -145,9 +155,10 @@ export class MapComponent implements OnInit, AfterViewInit {
           }
         }
         if (nullCount) {
+          const srid = getSRID(geoms[0]);
           this.snackBar.open(`
             GeoJSON creation and/or transformation to 4326 failed for ${nullCount} geometries.
-            Probably SRID 4326 is missing in table spatial_ref_sys.
+            Probably SRID ${srid} is missing in table spatial_ref_sys.
           `);
         }
       });

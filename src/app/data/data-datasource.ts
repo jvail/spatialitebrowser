@@ -28,7 +28,7 @@ export class DataDataSource extends DataSource<any> {
         this.dbService.exec(`select count(*) from ${item.name}`).then(results => {
           this.length = results[0][0].values[0][0];
           if (this.length === 0) {
-            this.snackBar.open('Result empty');
+            this.snackBar.open('Ok - Result empty');
           }
         });
         this.sort.active = '';
@@ -58,6 +58,9 @@ export class DataDataSource extends DataSource<any> {
               this.length = this.data.values.length;
               this.dataChanged$.next();
             } else {
+              if (Array.isArray(results[0]) && results[0].length === 0) {
+                this.snackBar.open('OK - Result empty');
+              }
               this.data.columns = [];
               this.data.values = [];
             }

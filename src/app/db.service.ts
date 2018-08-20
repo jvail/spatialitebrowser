@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Database, srid as getSRID, IShpFiles, IResult, IGeoJSONOptions } from 'spatiasql/dist/spatiasql';
 import { BehaviorSubject, Observable, timer } from 'rxjs';
 import { debounce, debounceTime } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material';
 
 // SELECT
 // HasIconv(),
@@ -192,17 +193,17 @@ export class DBService {
   private error: BehaviorSubject<string> = new BehaviorSubject('');
   error$ = this.error.asObservable();
 
-  constructor() {
+  constructor(public snackBar: MatSnackBar) {
 
     this.db = new Database();
     this.db.on('jobQueueChange', (no) => {
       this.jobCount.next(no);
     });
-    this.geo = new Database();
+    // this.geo = new Database();
 
   }
 
-  async exec(sql: string, userData?: any): Promise<IResult[] | any[]> {
+  exec(sql: string, userData?: any): Promise<IResult[] | any[]> {
 
     this.busy.next(true);
 
@@ -221,18 +222,34 @@ export class DBService {
   async asGeoJSON(geoms: Uint8Array[], options?: IGeoJSONOptions) {
 
     // just check the first one
-    const srid = getSRID(geoms[0]);
-    return this.geo.exec(`select InsertEpsgSrid(${srid})`)
-      .then(() => {
-        return this.geo.asGeoJSON(geoms, options)
-          .then(res => {
-            return res;
-          })
-          .catch(err => {
-            this.error.next(err);
-            return [];
-          });
-        });
+    // if (geoms.length && geoms[0] instanceof Uint8Array) {
+    //   const srid = getSRID(geoms[0]);
+    //   const exists = await this.geo.exec(`select exists (select 1 a from spatial_ref_sys where srid=${srid})`);
+    //   if (!exists[0][0].values[0][0]) {
+    //     const inlinedSrid = await this.geo.exec(`select InsertEpsgSrid(${srid})`);
+    //     if (!inlinedSrid[0][0].values[0][0]) {
+    //       const dbSrid = await this.db.exec(`
+    //         select srid, auth_name, auth_srid, ref_sys_name, proj4text, srtext from
+    //         spatial_ref_sys where srid=${srid}
+    //       `);
+    //       if (dbSrid[0][0].values[0]) {
+    //         await this.geo.exec(`
+    //           insert into spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text, srtext)
+    //           values(:srid, :auth_name, :auth_srid, :ref_sys_name, :proj4text, :srtext)`,
+    //           dbSrid[0][0].values[0]
+    //         );
+    //       }
+    //     }
+    //   }
+
+    return this.db.asGeoJSON(geoms, options)
+      .then(res => {
+        return res;
+      })
+      .catch(err => {
+        this.error.next(err);
+        return [[]];
+      });
 
   }
 
@@ -310,7 +327,7 @@ export class DBService {
 
   }
 
-  async loadshp(tablename: string, codeset: string, srid: number, shpfiles: IShpFiles) {
+  loadshp(tablename: string, codeset: string, srid: number, shpfiles: IShpFiles) {
 
     this.busy.next(true);
 
@@ -328,7 +345,7 @@ export class DBService {
 
   }
 
-  async export() {
+  export() {
     return this.db.export();
   }
 
