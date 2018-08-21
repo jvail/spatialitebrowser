@@ -13,7 +13,7 @@ import { srid as getSRID } from 'spatiasql/dist/spatiasql';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class MapComponent implements AfterViewInit {
 
   mapbox = mapboxgl;
   map: mapboxgl.Map;
@@ -44,7 +44,9 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.appservice.resizeMap$.subscribe(opened => {
       this.sideBarOpened = opened;
       setTimeout(() => {
-        this.map.resize();
+        if (this.map) {
+          this.map.resize();
+        }
       }, 25);
     });
 
@@ -57,9 +59,6 @@ export class MapComponent implements OnInit, AfterViewInit {
       }
     });
 
-  }
-
-  ngOnInit() {
   }
 
   ngAfterViewInit() {
@@ -117,6 +116,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       });
 
     this.map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
   }
 
   setGeoms(geoms: Uint8Array[]) {
@@ -128,16 +128,15 @@ export class MapComponent implements OnInit, AfterViewInit {
 
     this.dbservice.asGeoJSON(geoms, { bbox: false, precision: 6 })
       .then(jsons => {
-        jsons = jsons[0];
-        const nullCount = jsons.filter(json => json[0] === null).length;
+        const nullCount = jsons.filter(json => json === null).length;
         if (jsons.length) {
           this.featureCollection.features = jsons.reduce((arr, json, idx) => {
-            if (json[0] !== null) {
+            if (json !== null) {
               try {
                 arr.push({
                   id: idx + 1,
                   type: 'Feature',
-                  geometry: JSON.parse(json[0]),
+                  geometry: JSON.parse(json),
                   properties: {}
                 });
               } catch (err) {
@@ -145,7 +144,7 @@ export class MapComponent implements OnInit, AfterViewInit {
               }
             }
             return arr;
-          }, []);
+          }, <GeoJSON.Feature[]>[]);
           if (this.featureCollection.features.length > 0) {
             const bbox = turfbbox(this.featureCollection);
             this.map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 20 });

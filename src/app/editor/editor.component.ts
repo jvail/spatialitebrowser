@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, AfterContentChecked } from '@angular/core';
 import { AppService } from '../app.service';
-declare var CodeMirror;
+declare var CodeMirror: any;
 
 @Component({
   selector: 'app-editor',
@@ -12,7 +12,7 @@ export class EditorComponent implements OnInit, AfterViewInit {
   text = '';
   sqlQry = '';
   options = { maxLines: 1000, printMargin: false };
-  private editor;
+  private editor: any;
   @ViewChild('editor') editorRef: ElementRef;
 
   constructor(private appService: AppService) {
@@ -42,10 +42,6 @@ export class EditorComponent implements OnInit, AfterViewInit {
       this.editor.getDoc().setValue(this.sqlQry);
     }
 
-  }
-
-  onChange(code) {
-    console.log(code);
   }
 
   sql(): string {

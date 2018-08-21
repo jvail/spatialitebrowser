@@ -27,7 +27,7 @@ export class DataComponent implements OnInit {
   }
 
   // TODO: return proper string for all not-string-or-number types
-  getDisplayValue(thing) {
+  getDisplayValue(thing: any) {
 
     switch (typeof thing) {
       case 'object':

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Database, srid as getSRID, IShpFiles, IResult, IGeoJSONOptions } from 'spatiasql/dist/spatiasql';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { BehaviorSubject, Observable, timer, of } from 'rxjs';
 import { debounce, debounceTime } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
+import { GeoJSONGeometry } from 'mapbox-gl';
 
 // SELECT
 // HasIconv(),
@@ -51,7 +52,7 @@ export interface IItems {
 export class DBService {
 
   private db: Database;
-  private geo: Database;
+  // private geo: Database;
 
   private metaTables = [
     'spatial_ref_sys',
@@ -175,20 +176,20 @@ export class DBService {
   ];
 
 
-  private items: BehaviorSubject<IItems> = new BehaviorSubject({ tables: [], views: [], tablesMeta: [], viewsMeta: [] });
+  private items: BehaviorSubject<IItems> = new BehaviorSubject<IItems>({ tables: [], views: [], tablesMeta: [], viewsMeta: [] });
   items$ = this.items.asObservable();
 
   private initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
   initialized$ = this.initialized.asObservable();
 
-  private spatialRefSys: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  private spatialRefSys: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   spatialRefSys$ = this.spatialRefSys.asObservable();
 
   private busy: BehaviorSubject<boolean> = new BehaviorSubject(false);
   busy$ = this.busy.asObservable();
 
   private jobCount: BehaviorSubject<number> = new BehaviorSubject(1);
-  jobCount$ = this.jobCount.asObservable().pipe(debounce(no => no ? timer(0) : timer(100)));
+  jobCount$ = this.jobCount.asObservable().pipe(debounce(no => no ? of(no) : timer(100)));
 
   private error: BehaviorSubject<string> = new BehaviorSubject('');
   error$ = this.error.asObservable();
@@ -196,7 +197,7 @@ export class DBService {
   constructor(public snackBar: MatSnackBar) {
 
     this.db = new Database();
-    this.db.on('jobQueueChange', (no) => {
+    this.db.on('jobQueueChange', (no: number) => {
       this.jobCount.next(no);
     });
     // this.geo = new Database();
@@ -219,7 +220,7 @@ export class DBService {
       });
   }
 
-  async asGeoJSON(geoms: Uint8Array[], options?: IGeoJSONOptions) {
+  asGeoJSON(geoms: Uint8Array[], options?: IGeoJSONOptions): Promise<string[]> {
 
     // just check the first one
     // if (geoms.length && geoms[0] instanceof Uint8Array) {
@@ -244,11 +245,11 @@ export class DBService {
 
     return this.db.asGeoJSON(geoms, options)
       .then(res => {
-        return res;
+        return res[0];
       })
       .catch(err => {
         this.error.next(err);
-        return [[]];
+        return [];
       });
 
   }

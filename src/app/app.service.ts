@@ -17,7 +17,7 @@ export class AppService {
   item$: Subject<Item> = new Subject();
   query$: Subject<string> = new Subject();
   results$: Subject<any[] | IResult[]> = new Subject();
-  draw$: Subject<any[]> = new Subject();
+  draw$: Subject<any[][]> = new Subject();
   resizeMap$: Subject<boolean> = new Subject();
   highlightFeature$: Subject<number> = new Subject();
 

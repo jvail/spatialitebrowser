@@ -5,6 +5,8 @@ import { DBService, IVersion, ISRID } from '../db.service';
 import * as FileSaver from 'file-saver';
 import { AppService } from '../app.service';
 import { MatSnackBar } from '@angular/material';
+import { IShpFiles } from 'spatiasql/dist/spatiasql';
+import { EditorComponent } from '../editor/editor.component';
 
 @Component({
   selector: 'app-version-dialog',
@@ -86,7 +88,7 @@ export class NavComponent {
 
   @ViewChild('inputsqlite3') inputSqlite3: ElementRef;
   @ViewChild('inputshp') inputShp: ElementRef;
-  @ViewChild('appeditor') appeditor;
+  @ViewChild('appeditor') appeditor: EditorComponent;
 
   dbInitialized = false;
   dbIsBusy = false;
@@ -182,28 +184,29 @@ export class NavComponent {
             this.appservice.item$.next({ type: this.filter.getValue(), name: '' });
             this.inputSqlite3.nativeElement.value = '';
           };
-          reader.readAsArrayBuffer(files.item(0));
+          const sqlite3 = files.item(0);
+          if (sqlite3) {
+            reader.readAsArrayBuffer(sqlite3);
+          }
           break;
         case 'shp':
-          const shpfiles = {
-            shp: null,
-            shx: null,
-            dbf: null
-          };
+          const shpfiles: any = {};
           let tablename = '';
           for (let i = 0; i < files.length; i++) {
             const file = files.item(i);
-            tablename = file.name.toLowerCase().substr(0, file.name.length - 4);
-            switch (file.name.toLowerCase().substring(file.name.length - 3)) {
-              case 'shp':
-                shpfiles.shp = file;
-                break;
-              case 'shx':
-                shpfiles.shx = file;
-                break;
-              case 'dbf':
-                shpfiles.dbf = file;
-                break;
+            if (file) {
+              tablename = file.name.toLowerCase().substr(0, file.name.length - 4);
+              switch (file.name.toLowerCase().substring(file.name.length - 3)) {
+                case 'shp':
+                  shpfiles.shp = file;
+                  break;
+                case 'shx':
+                  shpfiles.shx = file;
+                  break;
+                case 'dbf':
+                  shpfiles.dbf = file;
+                  break;
+              }
             }
           }
           (async (dbservice) => {
@@ -226,7 +229,7 @@ export class NavComponent {
 
   }
 
-  async readFile(reader, file) {
+  async readFile(reader: FileReader, file: File) {
       return new Promise((res, rej) => {
         reader.onload = () => {
           res(reader.result);

@@ -14,7 +14,7 @@ export class AppComponent {
 
     const params = new URLSearchParams(window.location.search.substring(1));
     const url = params.get('db');
-    const qry = params.get('qry');
+    const qry = params.get('qry') ? params.get('qry') : '';
 
     if (url) {
       fetch(decodeURIComponent(url))
@@ -59,7 +59,7 @@ export class AppComponent {
 
   }
 
-  openDefaultDb(qry) {
+  openDefaultDb(qry: string|null) {
     fetch('assets/db/db.sqlite').then(defaultDb => {
       defaultDb.arrayBuffer().then(buffer => {
         this.dbService.open(buffer);
