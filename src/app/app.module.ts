@@ -27,7 +27,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MapComponent } from './map/map.component';
 import { DataComponent } from './data/data.component';
 import { EditorComponent } from './editor/editor.component';
-import { AngularSplitModule } from 'angular-split';
+import { AngularSplitModule } from 'angular-split-ng6';
 
 
 @NgModule({
